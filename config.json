@@ -1,0 +1,6 @@
+{
+  "idioma": "pt-BR",
+  "transliteracao": "bbt-pt",
+  "ignorar_citacao_direta": true,
+  "languagetool_url": "http://localhost:8081/v2"
+}

@@ -1,0 +1,383 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pandita · o caminho de um texto</title>
+<meta name="description" content="Como a skill pandita revisa um texto: oito estações, o arquivo que cada uma deixa e o que fica guardado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+:root{
+  --papel:#f3ecdd;
+  --folha:#fbf7ee;
+  --tinta:#1f2a22;
+  --suave:#4e5a4f;
+  --verde:#2f5d3a;
+  --verde-claro:#dce8d8;
+  --pauta:#d9e2d3;
+  --ocre:#87581f;
+  --risco:#f1ddd2;
+  --risco-tinta:#8a3b2a;
+  --risco-linha:#c48b78;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --sans:Montserrat,system-ui,"Segoe UI",Arial,sans-serif;
+  --margem:13rem;
+  --arquivo:13rem;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scrollbar-color:var(--verde) var(--papel)}
+body{margin:0;background:var(--papel);color:var(--tinta);font:400 1.0625rem/1.7 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:var(--verde);color:var(--folha)}
+a{color:var(--verde);text-underline-offset:.2em;text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:2px solid var(--verde);outline-offset:3px;border-radius:2px}
+code{font:500 .8125rem/1.3 ui-monospace,"Cascadia Mono",Consolas,monospace;color:var(--tinta)}
+.pular{position:absolute;left:1rem;top:1rem;background:var(--tinta);color:var(--folha);padding:.5rem .8rem;z-index:9}
+.pular:not(:focus){width:1px;height:1px;overflow:hidden;clip-path:inset(50%);padding:0}
+
+/* a folha do caderno: margem verde à esquerda, pauta fina no corpo */
+.folha{max-width:84rem;margin:clamp(0rem,3vw,2.5rem) auto;background:var(--folha);
+  display:grid;grid-template-columns:var(--margem) 1fr var(--arquivo);position:relative}
+.folha::before{content:"";position:absolute;top:0;bottom:0;left:var(--margem);width:2px;background:var(--verde);opacity:.22}
+
+/* abertura */
+.abertura{grid-column:1/-1;display:grid;grid-template-columns:subgrid;padding-block:clamp(3rem,7vw,6rem) clamp(2.5rem,5vw,4rem)}
+.sumario{grid-column:1;padding:0 1.5rem 0 1.75rem;font:500 .8125rem/1.5 var(--sans)}
+.sumario h2{font:600 .8125rem/1.3 var(--sans);color:var(--verde);margin:0 0 .9rem;letter-spacing:.02em}
+.sumario ol{list-style:none;margin:0;padding:0;counter-reset:s}
+.sumario li{counter-increment:s;margin:0 0 .45rem;display:grid;grid-template-columns:1.4rem 1fr}
+.sumario li::before{content:counter(s);font:600 .8125rem/1.5 var(--serif);color:var(--verde)}
+.sumario a{color:var(--suave);text-decoration:none}
+.sumario a:hover{color:var(--verde);text-decoration:underline}
+.capa{grid-column:2/4;padding:0 clamp(1.5rem,4vw,4rem)}
+h1{font:600 clamp(2.4rem,5.2vw,4.6rem)/1.04 var(--serif);letter-spacing:-.02em;margin:0 0 1.5rem;max-width:18ch;text-wrap:balance}
+.lead{font-size:1.25rem;line-height:1.6;max-width:42rem;margin:0 0 2.5rem}
+.lead strong{color:var(--tinta);font-weight:600}
+.frase{font:400 clamp(1.25rem,2.5vw,2.25rem)/1.6 var(--serif);max-width:52rem;margin:0;padding:.2rem 0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='44.8'%3E%3Crect y='43.8' width='8' height='1' fill='%23d9e2d3'/%3E%3C/svg%3E");background-size:8px 1.6em}
+.principio{margin:2.5rem 0 0;font:600 1rem/1.5 var(--sans);color:var(--verde)}
+
+/* o caminho */
+.caminho{grid-column:1/-1;position:relative;padding-bottom:3rem}
+.caminho>h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.trilho{position:absolute;top:0;bottom:0;left:calc(var(--margem) - 1px);width:4px;background:var(--verde);
+  transform-origin:top;transform:scaleY(var(--p,1))}
+.estacao{display:grid;grid-template-columns:var(--margem) 1fr var(--arquivo);padding-block:clamp(2.5rem,5vw,4rem);
+  position:relative}
+.no{grid-column:1;justify-self:end;margin-right:-1.375rem;width:2.75rem;height:2.75rem;border-radius:50%;
+  background:var(--verde);color:var(--folha);display:grid;place-items:center;font:600 1.0625rem/1 var(--serif);
+  border:2px solid var(--verde);position:relative;z-index:1;transition:background .5s cubic-bezier(.16,1,.3,1),color .5s}
+.corpo{grid-column:2;padding:0 clamp(1.5rem,4vw,4rem) 0 clamp(2.5rem,5vw,4.5rem);min-width:0}
+.estacao h3{font:600 clamp(1.6rem,2.8vw,2.25rem)/1.15 var(--serif);margin:.35rem 0 .9rem;letter-spacing:-.01em}
+.corpo>p{margin:0 0 1.4rem;max-width:36rem}
+.licao{font:400 1.25rem/2rem var(--serif);max-width:40rem;margin:0;padding:.1rem 0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='32'%3E%3Crect y='31' width='8' height='1' fill='%23d9e2d3'/%3E%3C/svg%3E");background-size:8px 2rem}
+.licao+.licao{margin-top:.25rem}
+.licao del{color:var(--risco-tinta);text-decoration:line-through;text-decoration-color:var(--risco-linha);background:var(--risco)}
+.licao ins{text-decoration:none;background:var(--verde-claro);color:var(--tinta)}
+.licao .rot{display:block;font:600 .8125rem/2rem var(--sans);color:var(--suave)}
+.medida{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;margin:0;padding:0;list-style:none;font:500 .8125rem/1.5 var(--sans)}
+.medida b{font:600 1.25rem/1.4 var(--serif);color:var(--verde);display:block}
+.arquivo{grid-column:3;margin:0;padding:.6rem 1.75rem 0 0;font:500 .8125rem/1.4 var(--sans);color:var(--suave)}
+.arquivo span{display:block;margin-bottom:.35rem}
+.arquivo code{display:inline-block;font-size:1.0625rem;padding:.35rem .65rem;color:var(--tinta);background:var(--verde-claro)}
+
+/* os professores marcam cada um de um jeito; a forma da marca, não a cor, diz quem foi */
+.m-san{text-decoration:underline double var(--verde);text-underline-offset:.22em}
+.m-flu{text-decoration:underline dotted var(--verde);text-decoration-thickness:2px;text-underline-offset:.28em}
+.m-pont{border:1.5px solid var(--verde);border-radius:50%;padding:0 .35em}
+.anotado{grid-column:1/3;grid-row:2;display:grid;grid-template-columns:var(--margem) 1fr;grid-auto-flow:row dense;row-gap:.9rem;margin-top:1.2rem}
+.anotado .licao{grid-column:2;margin-left:clamp(2.5rem,5vw,4.5rem);margin-right:clamp(1.5rem,4vw,4rem)}
+.anotado .notas{grid-column:1;padding:0 2.5rem 0 1.75rem;text-align:right}
+.nota{font:italic 400 1rem/1.35 var(--serif);color:var(--verde);margin:0 0 .45rem}
+.nota span{font-style:normal;font-weight:600}
+.nota .feito{background:var(--verde-claro);color:var(--tinta);font-weight:400;padding:0 .2em}
+.rot-medida{font:600 .8125rem/1.5 var(--sans);color:var(--suave);margin:0 0 .5rem}
+.vistos{list-style:none;margin:1.2rem 0 0;padding:0;max-width:40rem}
+.vistos li{display:grid;grid-template-columns:1.6rem 1fr;gap:.4rem;margin:0 0 .45rem}
+.vistos svg{width:1.2rem;height:1.2rem;margin-top:.2rem;color:var(--ocre)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:44rem}
+.dupla .licao{font-size:1.0625rem}
+
+/* depois do caminho */
+.fecho{grid-column:1/-1;display:grid;grid-template-columns:var(--margem) 1fr var(--arquivo);padding-block:clamp(3rem,6vw,5rem)}
+.fecho+.fecho{padding-top:0}
+.fecho>div{grid-column:2;padding:0 clamp(1.5rem,4vw,4rem) 0 clamp(2.5rem,5vw,4.5rem)}
+.fecho h2{font:600 clamp(1.6rem,2.8vw,2.25rem)/1.15 var(--serif);margin:0 0 1.5rem}
+.fecho p{max-width:36rem}
+.papeis{margin:0;padding:0;list-style:none;display:grid;gap:1.2rem;max-width:40rem}
+.papeis li{display:grid;grid-template-columns:minmax(9rem,13rem) 1fr;gap:.3rem 1.5rem;align-items:baseline}
+.papeis b{font:600 1.25rem/1.3 var(--serif);color:var(--verde)}
+.guardado{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:.9rem 1.6rem;max-width:42rem}
+.guardado dt code{font-size:1.0625rem;color:var(--verde)}
+.guardado dd{margin:0}
+.limites{margin:0;padding-left:1.2rem;max-width:40rem}
+.limites li{margin:0 0 .6rem}
+.limites li::marker{color:var(--verde)}
+.rodape{max-width:84rem;margin:0 auto 3rem;padding:0 1.75rem;font:500 .8125rem/1.5 var(--sans);color:var(--suave)}
+
+/* movimento: só com JS e sem pedido de menos movimento; sem isso, tudo já nasce aceso */
+@media (prefers-reduced-motion:no-preference){
+  .js .no{background:var(--folha);color:var(--verde)}
+  .js .estacao.aceso .no{background:var(--verde);color:var(--folha)}
+  .js .estacao .licao,.js .estacao .vistos,.js .estacao .dupla,.js .estacao .medida{
+    opacity:.25;transform:translateY(1.25rem);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+  .js .estacao.aceso .licao,.js .estacao.aceso .vistos,.js .estacao.aceso .dupla,.js .estacao.aceso .medida{opacity:1;transform:none}
+  .js .estacao.aceso .licao+.licao{transition-delay:.15s}
+  .js .resolvido .notas{transition:transform 1.1s cubic-bezier(.16,1,.3,1),opacity 1.1s}
+  .js .estacao:not(.aceso) .resolvido .notas{transform:translateX(-2rem);opacity:.5}
+  .js .resolvido ins{transition:background .8s .3s}
+  .js .estacao:not(.aceso) .resolvido ins{background:transparent}
+}
+
+@media (max-width:68rem){
+  :root{--margem:4.5rem;--arquivo:0rem}
+  .abertura{grid-template-columns:var(--margem) 1fr}
+  .capa{grid-column:2;grid-row:1}
+  .sumario{grid-column:2;grid-row:2;padding:2.5rem clamp(1.5rem,4vw,4rem) 0 clamp(2.5rem,5vw,4.5rem)}
+  .sumario ol{columns:2;column-gap:2rem}
+  .capa{padding-left:clamp(2.5rem,5vw,4.5rem)}
+  .estacao,.fecho{grid-template-columns:var(--margem) 1fr}
+  .no{grid-row:1/3}
+  .anotado{grid-column:2;grid-row:2;grid-template-columns:1fr;grid-auto-flow:row}
+  .anotado .licao,.anotado .notas{grid-column:1;margin:0;text-align:left;padding:0 1.5rem 0 clamp(2.5rem,5vw,4.5rem)}
+  #e4 .arquivo,#e5 .arquivo{grid-row:3}
+  .arquivo{grid-column:2;grid-row:2;padding:1.4rem 1.5rem 0 clamp(2.5rem,5vw,4.5rem)}
+  .arquivo span{display:inline;margin-right:.5rem}
+}
+@media (max-width:34rem){
+  :root{--margem:2.25rem}
+  body{font-size:1rem}
+  .folha{margin:0}
+  .capa,.corpo,.fecho>div,.sumario,.arquivo,.anotado .licao,.anotado .notas{padding-left:1.75rem;padding-right:1.25rem}
+  .sumario ol{columns:1}
+  .no{width:2.1rem;height:2.1rem;margin-right:-1.05rem;font-size:.8125rem}
+  .licao{font-size:1.0625rem}
+  .dupla{grid-template-columns:1fr;gap:.6rem}
+  .papeis li{grid-template-columns:1fr}
+  .guardado{grid-template-columns:1fr;gap:.2rem}
+  .guardado dd{margin-bottom:.8rem}
+}
+</style>
+</head>
+<body>
+<a class="pular" href="#caminho">Pular para o caminho</a>
+<main class="folha">
+
+  <header class="abertura">
+    <nav class="sumario" aria-labelledby="sumario-titulo">
+      <h2 id="sumario-titulo">As oito estações</h2>
+      <ol>
+        <li><a href="#e1">Você entrega</a></li>
+        <li><a href="#e2">O texto é aberto</a></li>
+        <li><a href="#e3">O texto é pesado</a></li>
+        <li><a href="#e4">Quatro professores leem</a></li>
+        <li><a href="#e5">Um editor junta</a></li>
+        <li><a href="#e6">Outro professor confere</a></li>
+        <li><a href="#e7">O antes e o depois</a></li>
+        <li><a href="#e8">Aprovado, vira Word</a></li>
+      </ol>
+    </nav>
+    <div class="capa">
+      <h1>O caminho de um texto no pandita</h1>
+      <p class="lead">Você entrega um texto. Ele passa por <strong>oito estações</strong> e volta como Word. Cada mudança vem com o porquê. Vamos seguir uma frase de verdade, do começo ao fim.</p>
+      <p class="frase">Krishna disse a Arjuna, no Bhagavad Gita, que a alma é eterna - e que o corpo é temporário.</p>
+      <p class="principio">Quem acha o erro não mexe no texto. Um editor muda. Outro confere.</p>
+    </div>
+  </header>
+
+  <section class="caminho" id="caminho" aria-labelledby="caminho-titulo">
+    <h2 id="caminho-titulo">O caminho, estação por estação</h2>
+    <div class="trilho" aria-hidden="true"></div>
+
+    <section class="estacao" id="e1" aria-labelledby="t1">
+      <div class="no" aria-hidden="true">1</div>
+      <div class="corpo">
+        <h3 id="t1">Você entrega</h3>
+        <p>Você manda o arquivo. Pode ser Word, Markdown ou texto puro. Um capítulo, um prefácio, uma resenha. PDF não entra.</p>
+        <p class="licao"><span class="rot">chega assim</span># Amostra</p>
+        <p class="licao">Krishna disse a Arjuna, no Bhagavad Gita, que a alma é eterna - e que o corpo é temporário.</p>
+        <p class="licao">No cenário atual, é importante ressaltar que a jornada transformadora é fundamental para o ecossistema.</p>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>documento.docx</code></p>
+    </section>
+
+    <section class="estacao" id="e2" aria-labelledby="t2">
+      <div class="no" aria-hidden="true">2</div>
+      <div class="corpo">
+        <h3 id="t2">O texto é aberto</h3>
+        <p>O script tira o texto de dentro do arquivo. Sobra só a letra, sem enfeite. O original fica guardado e nunca é escrito por cima.</p>
+        <p class="licao"><span class="rot">fica assim</span>Amostra</p>
+        <p class="licao">Krishna disse a Arjuna, no Bhagavad Gita, que a alma é eterna - e que o corpo é temporário.</p>
+        <p class="licao">No cenário atual, é importante ressaltar que a jornada transformadora é fundamental para o ecossistema.</p>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>texto.txt</code></p>
+    </section>
+
+    <section class="estacao" id="e3" aria-labelledby="t3">
+      <div class="no" aria-hidden="true">3</div>
+      <div class="corpo">
+        <h3 id="t3">O texto é pesado</h3>
+        <p>Antes de ler, a skill mede. Quantas palavras? Tem sânscrito? Que tipo de texto é? Com isso ela escolhe o modo. Até 600 palavras, rápido. Acima, completo.</p>
+        <p class="rot-medida">Na amostra inteira, com título e uma fala de diálogo:</p>
+        <ul class="medida">
+          <li><b>45</b>palavras</li>
+          <li><b>4</b>parágrafos</li>
+          <li><b>sim</b>tem sânscrito</li>
+          <li><b>rápido</b>é o modo</li>
+        </ul>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>modo</code></p>
+    </section>
+
+    <section class="estacao" id="e4" aria-labelledby="t4">
+      <div class="no" aria-hidden="true">4</div>
+      <div class="corpo">
+        <h3 id="t4">Quatro professores leem</h3>
+        <p>Quatro especialistas leem ao mesmo tempo. Cada um cuida de uma coisa só. Cada um marca o trecho do seu jeito e escreve o porquê na margem. Nenhum deles mexe no texto.</p>
+      </div>
+      <p class="arquivo"><span>deixam</span><code>quatro listas</code></p>
+      <div class="anotado">
+        <p class="licao"><span class="m-san">Krishna</span> disse a Arjuna, no <span class="m-san">Bhagavad Gita</span>, que a alma é eterna <span class="m-pont">-</span> e que o corpo é temporário.</p>
+        <div class="notas">
+          <p class="nota"><span class="m-san">Sânscrito</span> fora do padrão IAST</p>
+          <p class="nota"><span class="m-pont">Pontuação</span> o hífen é travessão</p>
+        </div>
+        <p class="licao"><span class="m-flu">No cenário atual, é importante ressaltar que a jornada transformadora é fundamental para o ecossistema.</span></p>
+        <div class="notas">
+          <p class="nota"><span class="m-flu">Fluidez</span> a frase enche e não diz</p>
+        </div>
+        <div class="notas">
+          <p class="nota">Norma: nada a apontar. Silêncio também é resposta.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="estacao" id="e5" aria-labelledby="t5">
+      <div class="no" aria-hidden="true">5</div>
+      <div class="corpo">
+        <h3 id="t5">Um editor junta</h3>
+        <p>As quatro listas viram uma só. Se dois professores discordam, decide o manual da casa. Depois, só o editor escreve no texto, e escreve tudo de uma vez. Cada nota da margem vira uma troca.</p>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>uma lista só</code></p>
+      <div class="anotado resolvido">
+        <p class="licao"><ins>Kṛṣṇa</ins> disse a Arjuna, no <ins>Bhagavad-gītā</ins>, que a alma é eterna <ins>—</ins> e que o corpo é temporário.</p>
+        <div class="notas">
+          <p class="nota">Sânscrito → <span class="feito">Kṛṣṇa, Bhagavad-gītā</span></p>
+          <p class="nota">Pontuação → <span class="feito">—</span></p>
+        </div>
+        <p class="licao"><ins>A transformação começa no hábito, não no discurso.</ins></p>
+        <div class="notas">
+          <p class="nota">Fluidez → <span class="feito">frase nova</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="estacao" id="e6" aria-labelledby="t6">
+      <div class="no" aria-hidden="true">6</div>
+      <div class="corpo">
+        <h3 id="t6">Outro professor confere</h3>
+        <p>Um revisor que não viu nada antes lê o texto novo. Ele faz três perguntas a cada mudança.</p>
+        <ul class="vistos">
+          <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11l4.5 4.5L17 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>A mudança se explica em uma frase?</li>
+          <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11l4.5 4.5L17 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Alguma coisa quebrou ou mudou de sentido?</li>
+          <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11l4.5 4.5L17 5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>A voz continua sendo de quem escreveu?</li>
+        </ul>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>revisada.txt</code></p>
+    </section>
+
+    <section class="estacao" id="e7" aria-labelledby="t7">
+      <div class="no" aria-hidden="true">7</div>
+      <div class="corpo">
+        <h3 id="t7">Você vê o antes e o depois</h3>
+        <p>Um painel abre no navegador. O original de um lado, o revisado do outro. Clique numa mudança e veja a regra. Você decide o que fica.</p>
+        <div class="dupla">
+          <p class="licao"><span class="rot">antes</span><del>Krishna</del> disse a Arjuna, no <del>Bhagavad Gita</del>, que a alma é eterna <del>-</del> e que o corpo é temporário. <del>No cenário atual, é importante ressaltar que a jornada transformadora é fundamental para o ecossistema.</del></p>
+          <p class="licao"><span class="rot">depois</span><ins>Kṛṣṇa</ins> disse a Arjuna, no <ins>Bhagavad-gītā</ins>, que a alma é eterna <ins>—</ins> e que o corpo é temporário. <ins>A transformação começa no hábito, não no discurso.</ins></p>
+        </div>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>painel.html</code></p>
+    </section>
+
+    <section class="estacao" id="e8" aria-labelledby="t8">
+      <div class="no" aria-hidden="true">8</div>
+      <div class="corpo">
+        <h3 id="t8">Aprovado, vira Word</h3>
+        <p>Só quando você diz <em>aprovado</em> sai o arquivo final. Ele pode vir com as mudanças em amarelo ou com marcas de revisão do Word. Na amostra, as quatro trocas viraram 8 marcas no Word: 4 entram e 4 saem.</p>
+        <p class="licao">Kṛṣṇa disse a Arjuna, no Bhagavad-gītā, que a alma é eterna — e que o corpo é temporário.</p>
+        <p class="licao">A transformação começa no hábito, não no discurso.</p>
+      </div>
+      <p class="arquivo"><span>deixa</span><code>revisado.docx</code></p>
+    </section>
+  </section>
+
+  <section class="fecho" aria-labelledby="papeis-titulo">
+    <div>
+      <h2 id="papeis-titulo">Quem faz o quê</h2>
+      <ul class="papeis">
+        <li><b>Especialista acha.</b><span>Aponta o trecho e diz por quê. Não troca nada.</span></li>
+        <li><b>Um editor aplica.</b><span>Junta tudo e muda o texto uma vez só. Assim ele não vira colcha de retalhos.</span></li>
+        <li><b>Revisor confere.</b><span>Lê com olho fresco e pergunta se cada troca valeu.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="fecho" aria-labelledby="guardado-titulo">
+    <div>
+      <h2 id="guardado-titulo">O que fica guardado</h2>
+      <p>Quatro coisas moram na skill e valem para toda revisão. Você pode editar cada uma.</p>
+      <dl class="guardado">
+        <dt><code>PADRAO.md</code></dt><dd>O manual da casa. Resolve as dúvidas e as brigas entre professores.</dd>
+        <dt><code>glossario.csv</code></dt><dd>Os termos em sânscrito, do jeito certo e dos jeitos errados.</dd>
+        <dt><code>referencias/</code></dt><dd>As regras de cada professor: norma, gênero e tipografia do sânscrito.</dd>
+        <dt><code>config.json</code></dt><dd>O idioma, a transliteração e o endereço do corretor que roda no seu computador.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="fecho" aria-labelledby="limites-titulo">
+    <div>
+      <h2 id="limites-titulo">O que ela não faz</h2>
+      <ul class="limites">
+        <li>Não lê PDF. Mande o Word ou o texto.</li>
+        <li>O Word sai como texto corrido. Itálico, títulos e notas do original não voltam.</li>
+        <li>O índice de marcas de IA é uma pista. Ele não prova quem escreveu.</li>
+        <li>Sem o LanguageTool ligado, a checagem de gramática fica de fora, e o relatório avisa.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+<p class="rodape">Para começar, diga <code>/pandita</code> e anexe o arquivo. Para ajuda, <code>/pandita ajuda</code>.</p>
+
+<script>
+(() => {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const caminho = document.getElementById("caminho");
+  const trilho = caminho.querySelector(".trilho");
+  const estacoes = [...caminho.querySelectorAll(".estacao")];
+  // a linha cresce até 55% da tela; o nó acende quando a linha chega nele
+  let pedido = 0;
+  function mede() {
+    pedido = 0;
+    const r = caminho.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
+    trilho.style.setProperty("--p", p.toFixed(4));
+    const ponta = r.top + p * r.height;
+    for (const e of estacoes) {
+      const no = e.querySelector(".no").getBoundingClientRect();
+      e.classList.toggle("aceso", no.top + no.height / 2 <= ponta + 1);
+    }
+  }
+  const agenda = () => { if (!pedido) pedido = requestAnimationFrame(mede); };
+  addEventListener("scroll", agenda, { passive: true });
+  addEventListener("resize", agenda);
+  mede();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+# Palavras que o corretor de português não conhece e não deve marcar.
+# Um termo por linha. Nomes próprios, epítetos, siglas e termos da casa.
+Damodara
+Dasi
+Devi
+Narada
+Vyassa
+Vyasa
+Satyavati
+Parashara
+Bhrigu
+Prajapati
+Daksha
+Shree
+Vak
+Kirti
+Smriti
+Medha
+Dhriti
+Kshama
+Acaryadeva
+Goswami
+Kali
+Yuga
+Srila
+Prabhupada
+Bhaktivedanta
+Swami
+Michaelis
+CNV
+TOD
+TDAH
+TEA
+H.D

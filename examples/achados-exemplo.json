@@ -1,0 +1,42 @@
+[
+  {
+    "regra": "IAST-GLOSSARIO",
+    "categoria": "sanscrito",
+    "severidade": "alta",
+    "linha": 2,
+    "antes": "Krishna",
+    "depois": "Kṛṣṇa",
+    "motivo": "Variante fora do padrão para Kṛṣṇa.",
+    "fonte": "glossário da casa"
+  },
+  {
+    "regra": "IAST-GLOSSARIO",
+    "categoria": "sanscrito",
+    "severidade": "alta",
+    "linha": 2,
+    "antes": "Bhagavad Gita",
+    "depois": "Bhagavad-gītā",
+    "motivo": "Variante fora do padrão para Bhagavad-gītā.",
+    "fonte": "glossário da casa"
+  },
+  {
+    "regra": "PONT-1",
+    "categoria": "pontuacao",
+    "severidade": "alta",
+    "linha": 2,
+    "antes": "eterna - e que",
+    "depois": "eterna — e que",
+    "motivo": "Travessão, não hífen.",
+    "fonte": "PADRAO §2"
+  },
+  {
+    "regra": "ESTILO-1",
+    "categoria": "fluidez",
+    "severidade": "alta",
+    "linha": 3,
+    "antes": "No cenário atual, é importante ressaltar que a jornada transformadora é fundamental para o ecossistema.",
+    "depois": "A transformação começa no hábito, não no discurso.",
+    "motivo": "Abertura de cenário, muleta e léxico inflado na mesma frase.",
+    "fonte": "PADRAO §5"
+  }
+]
