@@ -10,6 +10,9 @@ Subcomandos:
   docx     revisada.txt mudancas.json -> revisado.docx (destaque amarelo)
   diff     original.txt revisada.txt -> diff.html
   ia       texto.txt                -> indice de marcas de IA
+  estado   --out pasta --etapa X    -> ESTADO.md (ponto de parada)
+  doctor                            -> confere Python, python-docx, LanguageTool
+  init     [pasta]                  -> CLAUDE.md para retomar em outro computador
 
 Sem dependências além de python-docx (só no extract/docx).
 """
@@ -1147,6 +1150,85 @@ document.getElementById('copiar').onclick=async()=>{
 
 # ---------------------------------------------------------------- CLI
 
+# ------------------------------------------------- retomar em outro computador
+
+MODELO_CLAUDE = """# Revisões com a skill pandita
+
+Esta pasta é compartilhada entre computadores. Ao abrir uma conversa aqui:
+
+1. Se existir `revisoes/*/ESTADO.md`, leia e resuma em 3 linhas onde a revisão parou.
+   Se houver mais de um documento, pergunte qual. Não refaça etapa que já está pronta.
+2. Rode `python <pasta-da-skill>/scripts/pandita.py doctor`. Diga o que falta nesta máquina.
+3. Se o Drive criou cópias de conflito de um arquivo, mostre as duas e pergunte qual vale.
+4. A cada etapa concluída, grave o ponto de parada com o subcomando `estado`.
+"""
+
+
+def cmd_init(args) -> int:
+    destino = Path(args.pasta) / "CLAUDE.md"
+    if destino.exists():
+        print(f"mantido: {destino}")
+        return 0
+    escrever(destino, MODELO_CLAUDE)
+    print(f"criado: {destino}")
+    return 0
+
+
+def _lista(md: str, titulo: str) -> list[str]:
+    m = re.search(rf"^## {titulo}\n(.*?)(?=^## |\Z)", md, re.M | re.S)
+    return [l[2:].strip() for l in (m.group(1).splitlines() if m else []) if l.startswith("- ")]
+
+
+def cmd_estado(args) -> int:
+    import socket
+    from datetime import datetime
+    pasta = Path(args.out)
+    arq = pasta / "ESTADO.md"
+    antigo = arq.read_text(encoding="utf-8") if arq.exists() else ""
+    decisoes = _lista(antigo, "Decisões") + (args.decisao or [])
+    pendencias = args.pendencia if args.pendencia else _lista(antigo, "Pendências")
+    m = re.search(r"^- Etapa: (.*)$", antigo, re.M)
+    etapa = args.etapa or (m.group(1) if m else "começando")
+    arquivos = sorted(f.name for f in pasta.iterdir() if f.is_file() and f.name != "ESTADO.md") if pasta.exists() else []
+
+    def bloco(itens: list[str]) -> str:
+        return "\n".join(f"- {i}" for i in itens) or "- (nada)"
+
+    md = (f"# Estado da revisão: {pasta.name}\n\n- Etapa: {etapa}\n"
+          f"- Atualizado: {datetime.now():%Y-%m-%d %H:%M} em {socket.gethostname()}\n\n"
+          f"## Decisões\n{bloco(decisoes)}\n\n## Pendências\n{bloco(pendencias)}\n\n"
+          f"## Arquivos\n{bloco(arquivos)}\n")
+    escrever(arq, md)
+    print(f"estado gravado: {arq} (etapa: {etapa})")
+    return 0
+
+
+def cmd_doctor(args) -> int:
+    ok = True
+    def linha(bom: bool, msg: str, dica: str = "") -> None:
+        nonlocal ok
+        ok = ok and bom
+        print(("ok     " if bom else "FALTA  ") + msg + ("" if bom or not dica else f"  -> {dica}"))
+    linha(sys.version_info >= (3, 9), f"Python {sys.version.split()[0]}", "precisa de 3.9 ou mais")
+    try:
+        import docx  # noqa: F401
+        linha(True, "python-docx")
+    except ImportError:
+        linha(False, "python-docx", "pip install python-docx (sem ele não lê nem gera .docx)")
+    linha((raiz() / "glossario.csv").exists(), "glossario.csv")
+    url = carregar_config().get("languagetool_url")
+    if not url:
+        print("aviso  languagetool_url não definido: a checagem gramatical objetiva fica de fora")
+    else:
+        try:
+            urllib.request.urlopen(url.rstrip("/") + "/languages", timeout=3).read(1)
+            linha(True, f"LanguageTool em {url}")
+        except Exception:
+            linha(False, f"LanguageTool em {url}", "suba com scripts/lt.ps1 -Acao start (ou lt.sh start)")
+    print("tudo pronto." if ok else "resolva o que faltou antes de revisar.")
+    return 0 if ok else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(prog="pandita", description="revisão editorial PT-BR + sânscrito")
     ap.add_argument("--version", action="version", version=f"pandita {VERSION}")
@@ -1169,6 +1251,13 @@ def main() -> int:
     p7.add_argument("original"); p7.add_argument("revisada"); p7.add_argument("mudancas")
     p7.add_argument("--achados"); p7.add_argument("--ia"); p7.add_argument("--out", default="painel.html")
     p7.add_argument("--titulo")
+
+    p8 = sub.add_parser("estado", help="grava o ponto de parada em ESTADO.md")
+    p8.add_argument("--out", default="."); p8.add_argument("--etapa")
+    p8.add_argument("--decisao", action="append"); p8.add_argument("--pendencia", action="append")
+    p9 = sub.add_parser("doctor", help="confere o que falta neste computador")
+    p10 = sub.add_parser("init", help="cria o CLAUDE.md na pasta de trabalho")
+    p10.add_argument("pasta", nargs="?", default=".")
 
     args = ap.parse_args()
     try:
@@ -1198,6 +1287,12 @@ def _despachar(args) -> int:
         return 0
     if args.cmd == "painel":
         return cmd_painel(args)
+    if args.cmd == "estado":
+        return cmd_estado(args)
+    if args.cmd == "doctor":
+        return cmd_doctor(args)
+    if args.cmd == "init":
+        return cmd_init(args)
     return 1
 
 

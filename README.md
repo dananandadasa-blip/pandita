@@ -69,6 +69,7 @@ Se não houver `python` no PATH (Windows), use o atalho: `.\pandita.ps1 check te
 | `/pandita só sânscrito` | IAST, glossário e tipografia BBT |
 | `/pandita compara` | duas versões suas, aponta o que mudou |
 | `/pandita aprovo` | gera o `.docx` com destaques |
+| `/pandita retomar` | continua uma revisão iniciada em outro computador |
 
 Sem o comando, também funciona: "revisa este texto", "dá uma passada nesse capítulo".
 
@@ -82,10 +83,17 @@ python3 scripts/pandita.py painel texto.txt revisada.txt mudancas.json --out pai
 python3 scripts/pandita.py docx revisada.txt mudancas.json --out revisado.docx
 python3 scripts/pandita.py docx revisada.txt mudancas.json --original texto.txt --tracked --out revisado.docx
 python3 scripts/pandita.py ia texto.txt
+python3 scripts/pandita.py estado --out revisoes/doc --etapa "aplicada"
+python3 scripts/pandita.py doctor
+python3 scripts/pandita.py init .
 python3 scripts/pandita.py diff original.txt revisada.txt --out diff.html
 ```
 
 `check` usa o `glossario.csv` da própria skill por padrão. Com um LanguageTool local, acrescente `--lt http://localhost:8081/v2`.
+
+## Trabalhar em dois computadores
+
+Use a mesma pasta do Drive nos dois, mesmo que o caminho seja diferente. Em cada computador, instale a skill e o LanguageTool uma vez. A skill grava o `ESTADO.md` a cada etapa; ao abrir o Claude Code na pasta, o `CLAUDE.md` (criado por `python scripts/pandita.py init`) manda ler esse estado e rodar `doctor`. Espere o Drive terminar de sincronizar antes de trocar, e não edite o mesmo arquivo nos dois ao mesmo tempo.
 
 ## LanguageTool local (opcional, recomendado)
 

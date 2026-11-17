@@ -27,6 +27,7 @@ O trabalho pesado é de script (extrair, checar, aplicar, comparar, exportar). O
 | `/pandita só sânscrito` | IAST, glossário, tipografia BBT; não mexe no resto |
 | `/pandita compara` | duas versões da pessoa; aponta o que mudou e o que ficou |
 | `/pandita aprovo` | gera o DOCX final com destaques |
+| `/pandita retomar` | continua uma revisão que começou em outro computador (veja "Retomar") |
 | `/pandita ajuda` | guia curto de uso |
 
 ## Economia de contexto e token
@@ -50,6 +51,7 @@ Pasta de trabalho: `revisoes/<slug-do-documento>/`
 | `achados-revisao.json` | consolidado dos especialistas |
 | `revisada.txt` / `mudancas.json` | depois de aplicar |
 | `conflitos.json` | achado que o `apply` não conseguiu aplicar; confira à mão |
+| `ESTADO.md` | ponto de parada: etapa, decisões, pendências |
 | `painel.html` | o que a pessoa abre |
 | `<slug>-revisado.docx` | só depois do "aprovado" |
 
@@ -57,7 +59,7 @@ Aceita `.docx`, `.md`, `.txt`. O script não lê PDF: peça o original ou conver
 
 ## Fluxo
 
-1. **Contrato** — diga em 2 linhas o que entendeu (arquivo, modo, entrega). Siga.
+1. **Contrato** — diga em 2 linhas o que entendeu (arquivo, modo, entrega). Siga. Na primeira revisão de uma pasta, rode `init` para criar o `CLAUDE.md` que faz a retomada acontecer sozinha.
 2. **Extrair** — `python3 scripts/pandita.py extract <arquivo> --out revisoes/<slug>`
 3. **Diagnóstico** — leia `texto.txt`: gênero provável, presença de sânscrito, tamanho, e qual referência carregar.
 4. **Mecânica** — `check texto.txt --out revisoes/<slug>`. Usa o `glossario.csv` da skill e, se o `config.json` tiver `languagetool_url`, chama o servidor local sozinho. Para subir: `powershell -ExecutionPolicy Bypass -File scripts\lt.ps1 -Acao start` (Windows) ou `scripts/lt.sh start`.
@@ -72,7 +74,21 @@ Todos os comandos acima são `python3 <pasta-da-skill>/scripts/pandita.py <subco
 
 **Comparar duas versões** (`/pandita compara`): `diff a.txt b.txt --out revisoes/<slug>/diff.html`. Sem especialistas; só mostra o que mudou.
 
+**Ponto de parada**: ao fim de cada etapa (extrair, mecânica, consolidar, aplicar, painel, aprovação), rode `estado --out revisoes/<slug> --etapa "<etapa>"`, acrescentando `--decisao "<escolha da pessoa>"` e `--pendencia "<o que falta>"` quando houver (`--pendencia` substitui a lista). Isso grava `ESTADO.md` na pasta, que o Drive leva para o outro computador.
+
 Parada: duas passadas. A terceira só se a segunda achar algo de severidade alta que a primeira não viu.
+
+## Retomar em outro computador
+
+A pasta de trabalho sincroniza; a skill, o Python e o LanguageTool não (cada máquina tem os seus), e a conversa também não. Por isso a retomada lê arquivos, nunca a memória da conversa.
+
+Ao abrir uma conversa numa pasta com `revisoes/` (ou com `/pandita retomar`):
+
+1. `doctor`: diga o que falta nesta máquina e pare até resolver.
+2. Leia `revisoes/*/ESTADO.md`. Com mais de um documento, pergunte qual.
+3. Resuma em 3 linhas: etapa, decisões, pendências. Confira se os arquivos citados existem.
+4. Cópias de conflito do Drive (`(1)`, `conflito`) em `texto.txt`, `revisada.txt` ou `mudancas.json`: mostre as duas versões e pergunte qual vale. Nunca escolha sozinho.
+5. Continue da etapa seguinte, só depois do "pode seguir" da pessoa. Sem `ESTADO.md`, reconstrua pelos arquivos que existem e avise que as decisões da outra conversa se perderam.
 
 ## Brief dos especialistas
 

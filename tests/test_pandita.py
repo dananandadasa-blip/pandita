@@ -357,5 +357,22 @@ class TestDiff(unittest.TestCase):
         self.assertIn("<ins>", html)
 
 
+class TestRetomada(unittest.TestCase):
+    def test_estado_acumula_decisoes_e_troca_pendencias(self):
+        with tempfile.TemporaryDirectory() as d:
+            calado(pandita.cmd_estado, types.SimpleNamespace(out=d, etapa="mecânica", decisao=["A"], pendencia=["p1"]))
+            calado(pandita.cmd_estado, types.SimpleNamespace(out=d, etapa=None, decisao=["B"], pendencia=None))
+            md = (Path(d) / "ESTADO.md").read_text(encoding="utf-8")
+            self.assertIn("Etapa: mecânica", md)
+            self.assertIn("- A", md); self.assertIn("- B", md); self.assertIn("- p1", md)
+
+    def test_init_nao_sobrescreve(self):
+        with tempfile.TemporaryDirectory() as d:
+            calado(pandita.cmd_init, types.SimpleNamespace(pasta=d))
+            (Path(d) / "CLAUDE.md").write_text("meu", encoding="utf-8")
+            calado(pandita.cmd_init, types.SimpleNamespace(pasta=d))
+            self.assertEqual((Path(d) / "CLAUDE.md").read_text(encoding="utf-8"), "meu")
+
+
 if __name__ == "__main__":
     unittest.main()
